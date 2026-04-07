@@ -1,0 +1,10 @@
+[project]
+name = "descope-render"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "descope-mcp>=0.1.0",
+    "fastmcp>=3.2.0",
+]
