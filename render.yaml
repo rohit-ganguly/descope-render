@@ -3,8 +3,8 @@ services:
     name: descope-render
     runtime: python
     plan: free
-    buildCommand: pip install uv && uv sync --frozen
-    startCommand: uv run fastmcp run server.py --transport http --host 0.0.0.0 --port $PORT
+    buildCommand: pip install --no-cache-dir uv && uv sync --frozen
+    startCommand: uv run server.py --transport http --host 0.0.0.0 --port 8000 --path "/mcp"
     healthCheckPath: /health
     envVars:
       - key: DESCOPE_CONFIG_URL

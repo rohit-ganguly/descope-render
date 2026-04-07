@@ -1,15 +1,15 @@
 # MCP Server Template with Descope Auth (Python)
 
-A simple FastMCP server template for [Render](https://render.com), with full MCP authentication by [Descope](https://descope.com)
+A simple FastMCP server template for [Render](https://render.com), with full MCP authentication by [Descope](https://descope.com).
 
 ## What's included
 
-- A working MCP server using the [FastMCP](https://gofastmcp.com/getting-started/welcome) with Streamable HTTP transport
+- A working MCP server using [FastMCP](https://gofastmcp.com/getting-started/welcome) with Streamable HTTP transport
 - Full MCP Authorization Support with FastMCP's `DescopeProvider` and the `descope-mcp` SDK
 - One example tool (`hello`) that returns `"Hello, world!"` and enforces the `mcp:greet` scope
 - A `render.yaml` Blueprint for one-click deployment
 
-> **Note:** This template deploys on the free plan by default. Free services spin down after 15 minutes of inactivity, causing cold starts of 30-60 seconds on the next request. MCP clients may time out during this delay. For reliable use, upgrade to a [paid plan](https://render.com/pricing) in the Render Dashboard — the Starter plan keeps your service running continuously.
+> **Note:** This template deploys on Render's free plan by default. Free services spin down after 15 minutes of inactivity, causing cold starts of 30-60 seconds on the next request. MCP clients may time out during this delay. For reliable use, upgrade to a [paid plan](https://render.com/pricing) in the Render Dashboard — the Starter plan keeps your service running continuously.
 
 ## Prerequisites
 
@@ -31,6 +31,9 @@ A simple FastMCP server template for [Render](https://render.com), with full MCP
    ```
    This is your `DESCOPE_CONFIG_URL`.
 
+> **Note:** Descope issues tokens bound by Resource Indicators (RFC 8707), as required by the MCP spec. If you're running your MCP Server at a particular URL that's not `http://localhost:8000/mcp`, update the 'MCP Server URLs' field in the Descope console to ensure your tokens are issued for the right resource.
+
+
 ## Local development
 
 Now that you've set up your MCP Authorization Server, you can develop locally.
@@ -47,14 +50,14 @@ export SERVER_URL="http://localhost:8000"
 uv run server.py --transport http --port 8000
 ```
 
-When you run this locally, your server exposes an HTTP MCP endpoint at `http://localhost:8000/mcp`.
+When you run this locally, your server will run at `http://localhost:8000/mcp`.
 
 ## Deploying to Render
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
 1. Click **Deploy to Render** above (or push this repo to GitHub and import it as a Blueprint).
-2. When prompted, set the environment variable:
+2. When prompted, set the environment variable to the value obtained in the "Descope Setup" step:
    | Key | Value |
    |---|---|
    | `DESCOPE_CONFIG_URL` | Your Well-Known URL from the Descope Console |
@@ -76,3 +79,45 @@ When you run this locally, your server exposes an HTTP MCP endpoint at `http://l
 3. After login, Descope issues a signed JWT. The client includes this as a Bearer token on every MCP request.
 4. `DescopeProvider` validates the JWT using Descope's JWKS endpoint before any tool is called.
 5. Inside the tool, `validate_token()` parses the claims and `require_scopes()` checks that `mcp:greet` is present, returning an error to the client if not.
+
+## Next steps
+
+Now that you're all set up, there's a few more steps we recommend if you're taking your MCP Server to production.
+
+### Add your own tools
+
+Replace or extend the `hello` tool in `server.py` with your own logic. For each new tool:
+
+1. Define a new scope in the Descope Console under **MCP Server Scopes** (e.g. `mcp:yourtool:read`).
+2. Add the tool using the `@mcp.tool()` decorator.
+3. Call `require_scopes(token, ["mcp:your-scope"])` inside the tool body to enforce access control.
+4. Add the new tool and its required scope to the **Available tools** table above.
+
+```python
+@mcp.tool()
+def my_tool() -> str:
+    token = validate_token()
+    require_scopes(token, ["mcp:your-scope"])
+    return "your result"
+```
+
+### Use a custom domain on Render
+
+By default, your service is reachable at `https://<your-project>.onrender.com`. To use a custom domain:
+
+1. In the Render Dashboard, go to your service → **Settings → Custom Domains**.
+2. Add your domain and follow the DNS instructions provided.
+3. Once the domain is verified, update **MCP Server URLs** in the Descope Console to use your custom domain (e.g. `https://mcp.yourdomain.com/mcp`).
+4. No code changes are needed - `RENDER_EXTERNAL_URL` is set automatically by Render and will reflect the primary domain.
+
+### Protect all tools with scopes
+
+The `require_scopes()` check is intentionally opt-in per tool so you can add unauthenticated tools if needed. For a production server, it is good practice to call `require_scopes()` in every tool. You can also centralize this by writing a helper that wraps `validate_token()` and `require_scopes()` and calling it at the top of each tool handler.
+
+## Learn more
+
+- [Render Blueprints](https://render.com/docs/infrastructure-as-code)
+- [MCP specification](https://spec.modelcontextprotocol.io/)
+- [FastMCP by Prefect](https://github.com/prefecthq/fastmcp)
+- [Descope Agentic Identity Hub docs](docs.descope.com/agentic-identity-hub)
+- [Descope MCP SDK](https://docs.descope.com/mcp/python-sdk)

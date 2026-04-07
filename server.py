@@ -5,7 +5,7 @@ from descope_mcp import validate_token, require_scopes
 
 auth = DescopeProvider(
     config_url=os.environ["DESCOPE_CONFIG_URL"],
-    base_url=os.environ.get("SERVER_URL") or os.environ["RENDER_EXTERNAL_URL"],
+    base_url=os.environ.get("RENDER_EXTERNAL_URL") or os.environ.get("SERVER_URL"),
 )
 
 mcp = FastMCP("descope-render", auth=auth)
