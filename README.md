@@ -40,7 +40,7 @@ A simple FastMCP server template for [Render](https://render.com), with full MCP
 > Ensure that you've completed the [Descope Setup](#descope-setup) step prior to developing locally, as you'll need your `DESCOPE_CONFIG_URL`.
 
 1. Fork this repository to your GitHub account.
-2. Click **Deploy to Render** (or push this repo to GitHub and import it as a Blueprint in Render).
+2. Click **Deploy to Render** (or fork this repo on GitHub and import it as a Blueprint in your Render account).
 
    [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
 
