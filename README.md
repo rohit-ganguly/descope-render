@@ -21,11 +21,12 @@ A simple FastMCP server template for [Render](https://render.com), with full MCP
 
 1. Log in to the [Descope Console](https://app.descope.com).
 2. Navigate to **Agentic Identity Hub → MCP Servers**.
-3. Click **Create MCP Server** and give it a name.
+3. Click **+ MCP Server** to create a new MCP server and give it a name.
 4. Under **MCP Client Registration**, enable **Client ID Metadata Documents (CIMD)** and **Dynamic Client Registration (DCR)**. Optionally, you can restrict allowed domains for clients registering via CIMD (e.g. `https://claude.ai`) - feel free to leave this field blank.
 5. Under **MCP Server Scopes**, add a scope named `mcp:greet` and a simple description like "Greet the user".
 6. Click **Create**.
-7. Copy the **Well-Known URL** from the confirmation page — it looks like:
+7. Expand the `Connect your MCP server to Descope` section on the confirmation page
+8. Copy the **Well-Known URL**. It looks like this:
 
    ```url
    https://api.descope.com/v1/apps/agentic/.../.well-known/openid-configuration
